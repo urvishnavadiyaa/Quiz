@@ -8,7 +8,7 @@ import com.example.Quizfy.Model.Question;
 import com.example.Quizfy.Model.UserSession;
 import com.example.Quizfy.Repository.AttemptRepository;
 import com.example.Quizfy.Repository.QuestionRepository;
-import com.example.Quizfy.Repository.QuizRepository;
+import com.example.Quizfy.Repository.UserSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import java.util.Random;
 @Service
 public class QuizService {
     @Autowired
-    QuizRepository quizrepository;
+    UserSessionRepository userSessionRepository;
 
     @Autowired
     QuestionRepository questionrepository;
@@ -37,8 +37,7 @@ public class QuizService {
         user.setName(name);
         String sessionId = generateUniqueSessionId();
         user.setSessionId(sessionId);
-        user.setCount(0);
-        quizrepository.save(user);
+        userSessionRepository.save(user);
         return "User saved with sessionId: " + sessionId;
     }
 
@@ -49,7 +48,7 @@ public class QuizService {
         do {
             int number = 100000 + random.nextInt(900000);
             sessionId = String.valueOf(number);
-        } while (quizrepository.existsBySessionId(sessionId));
+        } while (userSessionRepository.existsBySessionId(sessionId));
 
         return sessionId;
     }
@@ -60,10 +59,13 @@ public class QuizService {
     }
 
     public DisplayQuestion getRandomUnattemptedQuestion(String sessionId) {
-        UserSession user = quizrepository.findBySessionId(sessionId)
+        UserSession user = userSessionRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
 
-        if (user.getCount() >= 5) {
+        if (user.getAtmpCount() != user.getSubCount()) {
+            throw new IllegalStateException("you must submit the answer");
+        }
+        if (user.getSubCount() >= 5) {
             throw new IllegalStateException("User has already attempted 5 questions");
         }
 
@@ -72,7 +74,9 @@ public class QuizService {
         if (selected == null) {
             throw new IllegalStateException("No more unattempted questions available");
         }
-
+        user.setAtmpCount(user.getAtmpCount() + 1);
+        user.setLastSub(selected.getId());
+        userSessionRepository.save(user);
         return convertToDTO(selected);
     }
 
@@ -89,10 +93,18 @@ public class QuizService {
     }
 
     public void submitAnswer(AttemptRequest attempt) {
-        UserSession user = quizrepository.findBySessionId(attempt.getSessionId())
+        UserSession user = userSessionRepository.findBySessionId(attempt.getSessionId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
 
-        if (user.getCount() >= 5) {
+        Question atmpQ = attemptRepo.findQuestionByUserAndQuestion(user.getSessionId(), attempt.getQuestionId());
+
+        if (atmpQ != null) {
+            throw new IllegalStateException("question is already attempted by this user");
+        }
+        if (user.getLastSub() != attempt.getQuestionId()) {
+            throw new IllegalStateException("that is not attempted by user");
+        }
+        if (user.getSubCount() >= 5) {
             throw new IllegalStateException("Maximum attempts reached");
         }
 
@@ -106,8 +118,8 @@ public class QuizService {
         aq.setUserAnswer(attempt.getSelectedOption());
         attemptRepo.save(aq);
 
-        user.setCount(user.getCount() + 1);
-        quizrepository.save(user);
+        user.setSubCount(user.getSubCount() + 1);
+        userSessionRepository.save(user);
     }
 
     public ShowResult displayResult(String id) throws CustomException {
@@ -116,7 +128,7 @@ public class QuizService {
         }
         UserSession user;
         try {
-            Optional<UserSession> us = quizrepository.findBySessionId(id);
+            Optional<UserSession> us = userSessionRepository.findBySessionId(id);
             if (!us.isPresent()) {
                 throw new CustomException("602", "id is null");
             }
@@ -177,7 +189,7 @@ public class QuizService {
 
         attemptRepo.deleteEntry(uid);
         UserSession us = new UserSession();
-        quizrepository.updateCount(uid);
+        userSessionRepository.updateCount(uid);
 
         return new ShowResult(uid, quesDto, countTrue, countFalse);
     }

@@ -46,6 +46,16 @@ public class QuizController {
         }
     }
 
+//    @GetMapping("/get-question")
+//    public ResponseEntity<?> getQuestion(@RequestBody AttemptRequest attemptRequest) {
+//        try {
+//            DisplayQuestion q = quizservice.nextQuestion(AttemptRequest);
+//            return ResponseEntity.ok(q);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     @PostMapping("/submit-answer")
     public ResponseEntity<String> submitAnswer(@RequestBody AttemptRequest attempt) {
         try {

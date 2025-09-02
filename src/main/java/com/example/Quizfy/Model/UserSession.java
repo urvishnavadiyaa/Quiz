@@ -12,9 +12,9 @@ public class UserSession {
     @Id
     @Column(name = "session_id", unique = true)
     private String sessionId;
-
-    private int count = 0;
-
+    private int atmpCount = 0;
+    private int subCount = 0;
+    private int lastSub;
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<AttemptQuestion> attempts;
 
@@ -34,11 +34,27 @@ public class UserSession {
         this.sessionId = sessionId;
     }
 
-    public int getCount() {
-        return count;
+    public int getAtmpCount() {
+        return atmpCount;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setAtmpCount(int atmpCount) {
+        this.atmpCount = atmpCount;
+    }
+
+    public int getSubCount() {
+        return subCount;
+    }
+
+    public void setSubCount(int subCount) {
+        this.subCount = subCount;
+    }
+
+    public int getLastSub() {
+        return lastSub;
+    }
+
+    public void setLastSub(int lastSub) {
+        this.lastSub = lastSub;
     }
 }

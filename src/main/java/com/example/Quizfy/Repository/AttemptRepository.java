@@ -1,6 +1,7 @@
 package com.example.Quizfy.Repository;
 
 import com.example.Quizfy.Model.AttemptQuestion;
+import com.example.Quizfy.Model.Question;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,4 +34,9 @@ public interface AttemptRepository extends JpaRepository<AttemptQuestion, Intege
     @Transactional
     @Query(value = "delete from attempt where session_id = ?1", nativeQuery = true)
     void deleteEntry(String uid);
+
+    @Query("SELECT a.question FROM AttemptQuestion a WHERE a.user.sessionId = :sessionId AND a.question.id = :questionId")
+    Question findQuestionByUserAndQuestion(@Param("sessionId") String sessionId,
+                                           @Param("questionId") int questionId);
+
 }
