@@ -12,8 +12,8 @@ public class UserSession {
     @Id
     @Column(name = "session_id", unique = true)
     private String sessionId;
-    private int atmpCount = 0;
-    private int subCount = 0;
+    private int atmpCount;
+    private int subCount;
     private int lastSub;
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<AttemptQuestion> attempts;
@@ -56,5 +56,17 @@ public class UserSession {
 
     public void setLastSub(int lastSub) {
         this.lastSub = lastSub;
+    }
+
+    public UserSession() {
+    }
+
+    public UserSession(String name, String sessionId, int atmpCount, int subCount, int lastSub, List<AttemptQuestion> attempts) {
+        this.name = name;
+        this.sessionId = sessionId;
+        this.atmpCount = atmpCount;
+        this.subCount = subCount;
+        this.lastSub = lastSub;
+        this.attempts = attempts;
     }
 }

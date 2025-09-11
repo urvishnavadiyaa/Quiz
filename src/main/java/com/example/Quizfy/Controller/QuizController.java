@@ -4,6 +4,7 @@ import com.example.Quizfy.DTO.*;
 import com.example.Quizfy.Exception.ControllerException;
 import com.example.Quizfy.Exception.CustomException;
 import com.example.Quizfy.Model.Question;
+import com.example.Quizfy.Model.UserSession;
 import com.example.Quizfy.Service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ public class QuizController {
     @Autowired
     QuizService quizservice;
 
-    @PostMapping("/save-one")
-    public ResponseEntity<String> saveUsers(@RequestBody UserSessionDTO request) {
+    @PostMapping("/save-user")
+    public ResponseEntity<String> saveUsers(@RequestBody UserSession request) {
         try {
             return ResponseEntity.ok(quizservice.saveUsers(request.getName()));
         } catch (IllegalArgumentException e) {
@@ -46,16 +47,6 @@ public class QuizController {
         }
     }
 
-//    @GetMapping("/get-question")
-//    public ResponseEntity<?> getQuestion(@RequestBody AttemptRequest attemptRequest) {
-//        try {
-//            DisplayQuestion q = quizservice.nextQuestion(AttemptRequest);
-//            return ResponseEntity.ok(q);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     @PostMapping("/submit-answer")
     public ResponseEntity<String> submitAnswer(@RequestBody AttemptRequest attempt) {
         try {
@@ -66,10 +57,10 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/display-result")
-    public ResponseEntity<?> display(@RequestBody UserSessionDTO id) {
+    @GetMapping("/display-result/{sessionId}")
+    public ResponseEntity<?> display(@PathVariable String sessionId) {
         try {
-            ShowResult ce = quizservice.displayResult(id.getSessionId());
+            ShowResult ce = quizservice.displayResult(sessionId);
             return new  ResponseEntity<>(ce,HttpStatus.OK);
         } catch (CustomException e) {
             ControllerException conE = new ControllerException(e.getErrorCode(), e.getErrorMessage());

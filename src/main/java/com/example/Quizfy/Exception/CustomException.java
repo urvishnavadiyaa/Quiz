@@ -12,20 +12,20 @@ public class CustomException extends Exception {
         this.errorCode = errorCode;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public CustomException() {
 
     }
 
     public CustomException(String errorCode, String errorMessage) {
         this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 }

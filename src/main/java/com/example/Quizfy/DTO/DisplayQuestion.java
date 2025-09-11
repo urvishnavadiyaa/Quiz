@@ -3,7 +3,6 @@ package com.example.Quizfy.DTO;
 public class DisplayQuestion {
 
     private int qId;
-//    private int sessionId;
     private String question;
     private String optionA;
     private String optionB;
@@ -17,14 +16,6 @@ public class DisplayQuestion {
     public void setqId(int qId) {
         this.qId = qId;
     }
-
-//    public int getSessionId() {
-//        return sessionId;
-//    }
-//
-//    public void setSessionId(int sessionId) {
-//        this.sessionId = sessionId;
-//    }
 
     public String getQuestion() {
         return question;
@@ -65,7 +56,4 @@ public class DisplayQuestion {
     public void setOptionD(String optionD) {
         this.optionD = optionD;
     }
-
-//    public void setId(int id) {
-//    }
 }

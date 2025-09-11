@@ -37,6 +37,9 @@ public class QuizService {
         user.setName(name);
         String sessionId = generateUniqueSessionId();
         user.setSessionId(sessionId);
+        user.setAtmpCount(0);
+        user.setSubCount(0);
+        user.setLastSub(0);
         userSessionRepository.save(user);
         return "User saved with sessionId: " + sessionId;
     }
