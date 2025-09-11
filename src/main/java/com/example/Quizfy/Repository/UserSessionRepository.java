@@ -17,6 +17,7 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Intege
     Optional<UserSession> findBySessionId(String sessionId);
 
     @Modifying
+    @Transactional
     @Query(value = "update user_session set atmp_count = 0, last_sub = 0, sub_count = 0 where session_id = ?1", nativeQuery = true)
     void updateCount(String uid);
 
