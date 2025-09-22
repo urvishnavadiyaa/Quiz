@@ -177,7 +177,6 @@ public class QuizService {
         }
 
         attemptRepo.deleteEntry(id);
-        UserSession us = new UserSession();
         userSessionRepository.updateCount(id);
 
         return new ShowResult(id, quesDto, countTrue, countFalse);
