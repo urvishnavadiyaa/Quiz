@@ -23,4 +23,5 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     @Query(value = "SELECT question, option_a, option_b, option_c, option_d, correct_answer FROM question WHERE q_id = ?1", nativeQuery = true)
     Object getRawQuestionData(int qid);
+
 }

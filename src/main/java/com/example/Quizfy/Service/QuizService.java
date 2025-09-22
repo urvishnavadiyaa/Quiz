@@ -62,13 +62,14 @@ public class QuizService {
     }
 
     public DisplayQuestion getRandomUnattemptedQuestion(String sessionId) {
-        UserSession user = userSessionRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
-
+        UserSession user = userSessionRepository.findBySessionId(sessionId);
+        if (user == null) {
+            throw new IllegalStateException("Invalid session ID");
+        }
         if (user.getAtmpCount() != user.getSubCount()) {
             throw new IllegalStateException("you must submit the answer");
         }
-        if (user.getSubCount() >= 5) {
+        if (user.getSubCount() == 5) {
             throw new IllegalStateException("User has already attempted 5 questions");
         }
 
@@ -78,7 +79,7 @@ public class QuizService {
             throw new IllegalStateException("No more unattempted questions available");
         }
         user.setAtmpCount(user.getAtmpCount() + 1);
-        user.setLastSub(selected.getId());
+        user.setLastSub(selected.getQId());
         userSessionRepository.save(user);
         return convertToDTO(selected);
     }
@@ -86,7 +87,7 @@ public class QuizService {
 
     private DisplayQuestion convertToDTO(Question q) {
         DisplayQuestion dto = new DisplayQuestion();
-        dto.setqId(q.getId());
+        dto.setQId(q.getQId());
         dto.setQuestion(q.getQuestion());
         dto.setOptionA(q.getOptionA());
         dto.setOptionB(q.getOptionB());
@@ -96,8 +97,10 @@ public class QuizService {
     }
 
     public void submitAnswer(AttemptRequest attempt) {
-        UserSession user = userSessionRepository.findBySessionId(attempt.getSessionId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
+        UserSession user = userSessionRepository.findBySessionId(attempt.getSessionId());
+        if (user == null) {
+            throw new IllegalStateException("Invalid session ID");
+        }
 
         Question atmpQ = attemptRepo.findQuestionByUserAndQuestion(user.getSessionId(), attempt.getQuestionId());
 
@@ -117,7 +120,7 @@ public class QuizService {
         AttemptQuestion aq = new AttemptQuestion();
         aq.setUser(user);
         aq.setQuestion(question);
-        aq.setCorrect(attempt.getSelectedOption().equals(question.getCorrectAnswer()));
+        aq.setIsCorrect(attempt.getSelectedOption().equals(question.getCorrectAnswer()));
         aq.setUserAnswer(attempt.getSelectedOption());
         attemptRepo.save(aq);
 
@@ -129,71 +132,52 @@ public class QuizService {
         if (id.isEmpty()) {
             throw new CustomException("601", "enter id");
         }
-        UserSession user;
         try {
-            Optional<UserSession> us = userSessionRepository.findBySessionId(id);
-            if (!us.isPresent()) {
-                throw new CustomException("602", "id is null");
-            }
-            user = us.get();
+            userSessionRepository.findBySessionId(id);
         } catch (IllegalArgumentException e) {
             throw new CustomException("603", "enter valid id");
         } catch (Exception e) {
             throw new CustomException("604", "something went wrong" + e.getMessage());
         }
 
-        String uid = user.getSessionId();
 
-        List<AttemptQuestion> attempted;
-        try {
-            List<AttemptQuestion> aq = attemptRepo.findQuestion(uid);
-            if (aq == null || aq.isEmpty()) {
-                throw new CustomException("605", "No attempts found for this session");
-            }
-            attempted = aq;
-        } catch (Exception e) {
-            throw new CustomException("606", "something went wrong" + e.getMessage());
-        }
+        List<Integer> qid = attemptRepo.findQid(id);
 
-
-        List<Integer> qid = attemptRepo.findQid(uid);
-
-        if (qid.isEmpty() || qid.size() < 5) {
+        if (qid.size() < 5) {
             throw new CustomException("607", "Complete your test then you can show the result");
         }
 
         List<Question> questions = questionrepository.findQue(qid);
 
-        if (questions.isEmpty() || questions.size() < 5) {
+        if (questions.size() < 5) {
             throw new CustomException("608", "Complete your test then you can show the result");
         }
 
-        int countTrue = attemptRepo.getCountTrue(uid);
-        int countFalse = attemptRepo.getCountFalse(uid);
+        int countTrue = attemptRepo.getCountTrue(id);
+        int countFalse = attemptRepo.getCountFalse(id);
 
         List<QuestionDTO> quesDto = new ArrayList<>();
         for (Integer quid : qid) {
             QuestionDTO qd = new QuestionDTO();
             Object[] row = (Object[]) questionrepository.getRawQuestionData(quid);
             qd.setId(quid);
-            qd.setQuestion((String) row[0]);
-            qd.setOptionA((String) row[1]);
-            qd.setOptionB((String) row[2]);
-            qd.setOptionC((String) row[3]);
-            qd.setOptionD((String) row[4]);
+            qd.setQuestion(String.valueOf(row[0]));
+            qd.setOptionA(String.valueOf(row[1]));
+            qd.setOptionB(String.valueOf(row[2]));
+            qd.setOptionC(String.valueOf(row[3]));
+            qd.setOptionD(String.valueOf(row[4]));
             qd.setCorrectAns(Option.valueOf(String.valueOf(row[5])));
 
-            Object[] row2 = (Object[]) attemptRepo.getRaw2QuestionData(quid, uid);
-            qd.setCorrect((Boolean) row2[0]);
+            Object[] row2 = (Object[]) attemptRepo.getRaw2QuestionData(quid, id);
+            qd.setIsCorrect((Boolean) row2[0]);
             qd.setUserAns(Option.valueOf(String.valueOf(row2[1])));
-
             quesDto.add(qd);
         }
 
-        attemptRepo.deleteEntry(uid);
+        attemptRepo.deleteEntry(id);
         UserSession us = new UserSession();
-        userSessionRepository.updateCount(uid);
+        userSessionRepository.updateCount(id);
 
-        return new ShowResult(uid, quesDto, countTrue, countFalse);
+        return new ShowResult(id, quesDto, countTrue, countFalse);
     }
 }

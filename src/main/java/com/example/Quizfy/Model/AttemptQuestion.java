@@ -2,7 +2,13 @@ package com.example.Quizfy.Model;
 
 import com.example.Quizfy.Enum.Option;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "attempt")
 public class AttemptQuestion {
@@ -26,43 +32,4 @@ public class AttemptQuestion {
     @Column(name = "user_ans")
     private Option userAnswer;
 
-    public int getId() {
-        return id;
-    }
-
-    public Option getUserAnswer() {
-        return userAnswer;
-    }
-
-    public void setUserAnswer(Option userAnswer) {
-        this.userAnswer = userAnswer;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public UserSession getUser() {
-        return user;
-    }
-
-    public void setUser(UserSession user) {
-        this.user = user;
-    }
-
-    public Question getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(Question question) {
-        this.question = question;
-    }
-
-    public Boolean getCorrect() {
-        return isCorrect;
-    }
-
-    public void setCorrect(Boolean correct) {
-        isCorrect = correct;
-    }
 }

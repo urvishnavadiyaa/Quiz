@@ -1,5 +1,7 @@
 package com.example.Quizfy.Exception;
 
+import lombok.Data;
+
 public class ControllerException extends Exception {
     public String getErrorCode() {
         return errorCode;

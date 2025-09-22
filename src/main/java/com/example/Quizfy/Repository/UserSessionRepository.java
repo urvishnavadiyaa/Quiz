@@ -14,7 +14,8 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Intege
 
     boolean existsBySessionId(String sessionId);
 
-    Optional<UserSession> findBySessionId(String sessionId);
+    @Query(value = "select * from  user_session where session_id = ?1", nativeQuery = true)
+    UserSession findBySessionId(String sessionId);
 
     @Modifying
     @Transactional
