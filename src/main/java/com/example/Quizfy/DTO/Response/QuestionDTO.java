@@ -1,4 +1,4 @@
-package com.example.Quizfy.DTO;
+package com.example.Quizfy.DTO.Response;
 
 import com.example.Quizfy.Enum.Option;
 import lombok.Data;

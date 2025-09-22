@@ -1,6 +1,8 @@
 package com.example.Quizfy.Controller;
 
-import com.example.Quizfy.DTO.*;
+import com.example.Quizfy.DTO.Request.AttemptRequest;
+import com.example.Quizfy.DTO.Response.DisplayQuestion;
+import com.example.Quizfy.DTO.Response.ShowResult;
 import com.example.Quizfy.Exception.ControllerException;
 import com.example.Quizfy.Exception.CustomException;
 import com.example.Quizfy.Model.Question;

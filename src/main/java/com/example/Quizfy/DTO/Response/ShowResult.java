@@ -1,4 +1,4 @@
-package com.example.Quizfy.DTO;
+package com.example.Quizfy.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

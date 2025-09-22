@@ -1,6 +1,9 @@
 package com.example.Quizfy.Service;
 
-import com.example.Quizfy.DTO.*;
+import com.example.Quizfy.DTO.Request.AttemptRequest;
+import com.example.Quizfy.DTO.Response.DisplayQuestion;
+import com.example.Quizfy.DTO.Response.QuestionDTO;
+import com.example.Quizfy.DTO.Response.ShowResult;
 import com.example.Quizfy.Enum.Option;
 import com.example.Quizfy.Exception.CustomException;
 import com.example.Quizfy.Model.AttemptQuestion;
@@ -14,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
